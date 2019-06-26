@@ -1,5 +1,5 @@
 ---
-title: "I'm using Elmstatic for my blog"
+title: I'm using Elmstatic for my blog
 tags: software other
 ---
 

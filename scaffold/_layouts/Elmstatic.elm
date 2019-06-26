@@ -1,12 +1,9 @@
-module Elmstatic exposing
+port module Elmstatic exposing
     ( Content
     , Layout
     , Page
     , Post
-    , PostList
     , decodePage
-    , decodePost
-    , decodePostList
     , htmlTemplate
     , inlineScript
     , layout
@@ -17,18 +14,14 @@ module Elmstatic exposing
 import Browser
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Json.Decode
+import Json.Decode as Decode exposing (Decoder)
+import Json.Encode as Encode
+import PageType exposing (PostData, PostList, postDataDecoder)
+import SiteConfig exposing (SiteConfig)
 
 
 type alias Post =
-    { date : String
-    , link : String
-    , markdown : String
-    , section : String
-    , siteTitle : String
-    , tags : List String
-    , title : String
-    }
+    PostData
 
 
 type alias Page =
@@ -38,49 +31,26 @@ type alias Page =
     }
 
 
-type alias PostList =
-    { posts : List Post
-    , section : String
-    , siteTitle : String
-    , title : String
+type alias Content a =
+    { a | title : String }
+
+
+type alias SiteContent a =
+    { siteConfig : SiteConfig
+    , content : Content a
     }
 
 
-type alias Content a =
-    { a | siteTitle : String, title : String }
-
-
 type alias Layout =
-    Program Json.Decode.Value Json.Decode.Value Never
+    Program Decode.Value Decode.Value Never
 
 
-decodePage : Json.Decode.Decoder Page
+decodePage : Decode.Decoder Page
 decodePage =
-    Json.Decode.map3 Page
-        (Json.Decode.field "markdown" Json.Decode.string)
-        (Json.Decode.field "siteTitle" Json.Decode.string)
-        (Json.Decode.field "title" Json.Decode.string)
-
-
-decodePost : Json.Decode.Decoder Post
-decodePost =
-    Json.Decode.map7 Post
-        (Json.Decode.field "date" Json.Decode.string)
-        (Json.Decode.field "link" Json.Decode.string)
-        (Json.Decode.field "markdown" Json.Decode.string)
-        (Json.Decode.field "section" Json.Decode.string)
-        (Json.Decode.field "siteTitle" Json.Decode.string)
-        (Json.Decode.field "tags" <| Json.Decode.list Json.Decode.string)
-        (Json.Decode.field "title" Json.Decode.string)
-
-
-decodePostList : Json.Decode.Decoder PostList
-decodePostList =
-    Json.Decode.map4 PostList
-        (Json.Decode.field "posts" <| Json.Decode.list decodePost)
-        (Json.Decode.field "section" Json.Decode.string)
-        (Json.Decode.field "siteTitle" Json.Decode.string)
-        (Json.Decode.field "title" Json.Decode.string)
+    Decode.map3 Page
+        (Decode.field "markdown" Decode.string)
+        (Decode.field "siteTitle" Decode.string)
+        (Decode.field "title" Decode.string)
 
 
 script : String -> Html Never
@@ -116,22 +86,43 @@ htmlTemplate title contentNodes =
         ]
 
 
-layout : Json.Decode.Decoder (Content content) -> (Content content -> List (Html Never)) -> Layout
-layout decoder view =
+layout : Decoder (Content content) -> (Content content -> List (Html Never)) -> Layout
+layout contentDecoder view =
+    let
+        decoder =
+            Decode.map2 SiteContent
+                (Decode.field "siteConfig" SiteConfig.decoder)
+                (Decode.at [ "content", "data" ] contentDecoder)
+    in
     Browser.document
-        { init = \contentJson -> ( contentJson, Cmd.none )
+        { init =
+            \contentJson ->
+                case Decode.decodeValue decoder contentJson of
+                    Ok _ ->
+                        ( contentJson, Cmd.none )
+
+                    Err error ->
+                        ( contentJson, sendError (Decode.errorToString error) )
         , view =
             \contentJson ->
-                case Json.Decode.decodeValue decoder contentJson of
+                case Decode.decodeValue decoder contentJson of
                     Err error ->
                         { title = ""
-                        , body = [ htmlTemplate "Error" [ Html.text <| Json.Decode.errorToString error ] ]
+                        , body = [ htmlTemplate "Error" [ Html.text <| Decode.errorToString error ] ]
                         }
 
-                    Ok content ->
+                    Ok input ->
                         { title = ""
-                        , body = [ htmlTemplate content.siteTitle <| view content ]
+                        , body = [ htmlTemplate input.siteConfig.title <| view input.content ]
                         }
         , update = \msg contentJson -> ( contentJson, Cmd.none )
         , subscriptions = \_ -> Sub.none
         }
+
+
+sendError : String -> Cmd msg
+sendError errMsg =
+    renderError (Encode.string errMsg)
+
+
+port renderError : Encode.Value -> Cmd msg

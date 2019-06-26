@@ -1,5 +1,5 @@
 ---
-title: "All posts"
+title: All posts
 layout: Posts
 ---
 

@@ -1,5 +1,5 @@
 ---
-title: "Another post"
+title: Another post
 tags: other
 ---
 

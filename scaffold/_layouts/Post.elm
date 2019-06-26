@@ -3,7 +3,9 @@ module Post exposing (main, metadataHtml)
 import Elmstatic exposing (..)
 import Html exposing (..)
 import Html.Attributes as Attr exposing (alt, attribute, class, href, src)
+import Json.Decode as Decode exposing (Decoder)
 import Page
+import PageType exposing (PostData, postDataDecoder)
 
 
 tagsToHtml : List String -> List (Html Never)
@@ -18,7 +20,7 @@ tagsToHtml tags =
     List.map linkify tags
 
 
-metadataHtml : Elmstatic.Post -> Html Never
+metadataHtml : PostData -> Html Never
 metadataHtml post =
     div [ class "post-metadata" ]
         ([ span [] [ text post.date ]
@@ -30,8 +32,8 @@ metadataHtml post =
 
 main : Elmstatic.Layout
 main =
-    Elmstatic.layout Elmstatic.decodePost <|
-        \content ->
+    Elmstatic.layout postDataDecoder <|
+        \post ->
             Page.layout
-                content.title
-                [ metadataHtml content, Page.markdown content.markdown ]
+                post.title
+                [ metadataHtml post, Page.markdown post.content ]
