@@ -28,8 +28,6 @@ if (mode == "generate" || mode == "draft") {
 
   const config = JSON.parse(Fs.readFileSync("config.json").toString());
   const { copy, feed, elm, outputDir, siteTitle } = config;
-  const allowedTags = R.map(R.toLower, R.defaultTo([], config.tags));
-  const includeDrafts = mode == "draft";
 
   try {
     console.log(`Compiling Site Engine...`);
@@ -40,21 +38,21 @@ if (mode == "generate" || mode == "draft") {
 
     let siteSrc = {
       config: config,
-      files: readContentFiles()
+      files: readContentFiles(config.contentDirs, config.contentExtensions)
     };
 
     Elm.FileProcessor.init({
       flags: siteSrc
     }).ports.sendFileData.subscribe(parsedSrc => {
-        if (parsedSrc.error) {
-            console.log(`
+      if (parsedSrc.error) {
+        console.log(`
 I had a problem processing your source files:
 
 ${parsedSrc.error}`);
-            process.exit(1);
-        } else {
-            renderFiles(elmJs, parsedSrc);
-        }
+        process.exit(1);
+      } else {
+        renderFiles(elmJs, parsedSrc, config);
+      }
     });
   } catch (err) {
     console.log(err.message);
@@ -68,7 +66,7 @@ ${parsedSrc.error}`);
 function build(elmPath) {
   const layouts = R.reject(
     R.endsWith("Elmstatic.elm"),
-    Glob.sync("_layouts/Post*.elm")
+    Glob.sync("_layouts/*.elm")
   );
   const engine = "_engine/FileProcessor.elm";
   const elmFiles = layouts.concat(engine);
@@ -83,7 +81,6 @@ function build(elmPath) {
 
 // () -> ()/Effects
 function generateScaffold() {
-  console.log("Generating scaffold...");
   Fs.copySync(Path.join(__dirname, "..", "scaffold"), process.cwd());
 }
 
@@ -103,31 +100,40 @@ function printHelp() {
   ]);
 }
 
-function readContentFiles() {
-  const fileNames = Glob.sync("_posts/**/*");
-  return R.map(readFileData, fileNames);
+function readContentFiles(contentDirs, extensions) {
+  return contentDirs
+    .map(dir => {
+      return Glob.sync(`${dir}/**/*`, { nodir: true });
+    })
+    .flat()
+    .map(readFileData.bind(null, extensions));
 }
 
-function readFileData(path) {
+function readFileData(extensions, path) {
+  const isContentFile = extensions.includes(Path.extname(path));
   return {
     path: path,
-    content: Fs.readFileSync(path).toString()
+    content: isContentFile ? Fs.readFileSync(path).toString() : ""
   };
 }
 
-function renderFiles(elmJs, parsedSrc) {
+function renderFiles(elmJs, parsedSrc, config) {
   parsedSrc.files.forEach(file => {
-    generateHtml(elmJs, {
-      siteConfig: parsedSrc.siteConfig,
-      content: file
-    }).then(page => {
-      writePage(page);
-    });
+    if (file.layout !== "Static") {
+      generateHtml(elmJs, {
+        siteConfig: parsedSrc.siteConfig,
+        content: file
+      }).then(page => {
+        writePage(page, config);
+      });
+    } else {
+      Fs.copySync(file.sourcePath, Path.join("dist", file.destPath));
+    }
   });
 }
 
-function writePage(page) {
-  const outputPath = Path.join("dist", page.outputPath);
+function writePage(page, config) {
+  const outputPath = Path.join(config.outputDir, page.outputPath);
   Fs.mkdirsSync(Path.dirname(outputPath));
   Fs.writeFileSync(outputPath, page.html);
 }

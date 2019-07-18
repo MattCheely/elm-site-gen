@@ -74,7 +74,22 @@ parsePostList file =
 
 parsePage : File -> Result String PageData
 parsePage file =
-    Debug.todo "Parse the page"
+    case parsePreamble file.content of
+        Err deadEnds ->
+            Err (deadEndsToString deadEnds)
+
+        Ok ( preambleData, markdown ) ->
+            Result.map3 PageData
+                (Ok markdown)
+                (Dict.get "title" preambleData
+                    |> Result.fromMaybe "No title in preamble!"
+                )
+                (Ok
+                    (file.path
+                        |> String.replace "_pages/" ""
+                        |> String.dropRight 3
+                    )
+                )
 
 
 

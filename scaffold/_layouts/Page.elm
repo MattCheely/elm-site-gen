@@ -4,6 +4,7 @@ import Elmstatic exposing (..)
 import Html exposing (..)
 import Html.Attributes as Attr exposing (alt, attribute, class, href, src)
 import Markdown
+import PageType exposing (pageDataDecoder)
 import Styles
 
 
@@ -120,6 +121,6 @@ layout title contentItems =
 
 main : Elmstatic.Layout
 main =
-    Elmstatic.layout Elmstatic.decodePage <|
-        \content ->
-            layout content.title [ markdown content.markdown ]
+    Elmstatic.layout pageDataDecoder <|
+        \page ->
+            layout page.title [ markdown page.content ]

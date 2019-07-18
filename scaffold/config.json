@@ -1,9 +1,8 @@
 {
     "title": "Author's fancy blog",
-    "outputDir": "_site",
-    "copy": {
-        "/posts": "/"
-    },
+    "outputDir": "dist",
+    "contentDirs": ["_pages", "_posts", "_resources"],
+    "contentExtensions": [".md"],
     "feed": {
         "title": "Author's fancy blog",
         "description": "Author's blog posts",

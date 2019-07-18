@@ -1,9 +1,6 @@
 port module Elmstatic exposing
     ( Content
     , Layout
-    , Page
-    , Post
-    , decodePage
     , htmlTemplate
     , inlineScript
     , layout
@@ -16,19 +13,8 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Json.Decode as Decode exposing (Decoder)
 import Json.Encode as Encode
-import PageType exposing (PostData, PostList, postDataDecoder)
+import PageType exposing (PageData, PostData, PostList, postDataDecoder)
 import SiteConfig exposing (SiteConfig)
-
-
-type alias Post =
-    PostData
-
-
-type alias Page =
-    { markdown : String
-    , siteTitle : String
-    , title : String
-    }
 
 
 type alias Content a =
@@ -43,14 +29,6 @@ type alias SiteContent a =
 
 type alias Layout =
     Program Decode.Value Decode.Value Never
-
-
-decodePage : Decode.Decoder Page
-decodePage =
-    Decode.map3 Page
-        (Decode.field "markdown" Decode.string)
-        (Decode.field "siteTitle" Decode.string)
-        (Decode.field "title" Decode.string)
 
 
 script : String -> Html Never

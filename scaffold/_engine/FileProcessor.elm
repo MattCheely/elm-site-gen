@@ -55,7 +55,7 @@ parseFile file =
                 |> Result.mapError errWithPath
 
         ( _, Unknown ) ->
-            Err "unknown file type."
+            Ok (Static file.path (String.dropLeft 1 file.path))
 
         ( UnknownCategory, _ ) ->
             Err "unknown file category."

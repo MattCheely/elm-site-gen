@@ -4,6 +4,7 @@ module PageType exposing
     , PostData
     , PostList
     , encode
+    , pageDataDecoder
     , postDataDecoder
     , postListDecoder
     , postPath
@@ -17,6 +18,7 @@ type PageType
     = Post PostData
     | Posts PostList
     | Page PageData
+    | Static String String
 
 
 type alias PostList =
@@ -57,7 +59,17 @@ encode pageType =
                 ]
 
         Page pageData ->
-            Debug.todo "Handle Pages"
+            Encode.object
+                [ ( "layout", Encode.string "Page" )
+                , ( "data", encodePageData pageData )
+                ]
+
+        Static src dest ->
+            Encode.object
+                [ ( "layout", Encode.string "Static" )
+                , ( "sourcePath", Encode.string src )
+                , ( "destPath", Encode.string dest )
+                ]
 
 
 postPath : PostData -> String
@@ -101,3 +113,21 @@ postListDecoder =
     Decode.map2 PostList
         (Decode.field "posts" (Decode.list postDataDecoder))
         (Decode.field "title" Decode.string)
+
+
+encodePageData : PageData -> Value
+encodePageData pageData =
+    Encode.object
+        [ ( "title", Encode.string pageData.title )
+        , ( "content", Encode.string pageData.content )
+        , ( "slug", Encode.string pageData.slug )
+        , ( "outputPath", Encode.string (pageData.slug ++ "/index.html") )
+        ]
+
+
+pageDataDecoder : Decoder PageData
+pageDataDecoder =
+    Decode.map3 PageData
+        (Decode.field "content" Decode.string)
+        (Decode.field "title" Decode.string)
+        (Decode.field "slug" Decode.string)
