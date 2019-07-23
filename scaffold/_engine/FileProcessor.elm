@@ -1,8 +1,8 @@
 port module FileProcessor exposing (main)
 
+import Content exposing (Content(..), PageData, PostData)
 import Json.Encode as Encode
 import Md
-import PageType exposing (PageData, PageType(..), PostData)
 import Platform exposing (worker)
 import SiteConfig exposing (SiteConfig)
 
@@ -19,14 +19,14 @@ type alias File =
     }
 
 
-parseFileData : List File -> Result String (List PageType)
+parseFileData : List File -> Result String (List Content)
 parseFileData files =
     List.map parseFile files
         -- TODO: It would be nicer if this collected all errors
         |> List.foldr (Result.map2 (::)) (Ok [])
 
 
-parseFile : File -> Result String PageType
+parseFile : File -> Result String Content
 parseFile file =
     let
         fileType =
@@ -55,7 +55,7 @@ parseFile file =
                 |> Result.mapError errWithPath
 
         ( _, Unknown ) ->
-            Ok (Static file.path (String.dropLeft 1 file.path))
+            Ok (Static file.path file.path)
 
         ( UnknownCategory, _ ) ->
             Err "unknown file category."
@@ -75,13 +75,13 @@ getFileType path =
 
 
 getCategory path =
-    if String.startsWith "_pages/" path then
+    if String.startsWith "pages/" path then
         PageCategory
 
-    else if path == "_posts/index.md" then
+    else if path == "posts/index.md" then
         PostListCategory
 
-    else if String.startsWith "_posts/" path then
+    else if String.startsWith "posts/" path then
         PostCategory
 
     else
@@ -106,7 +106,7 @@ init siteSrc =
                         , ( "files"
                           , fileData
                                 |> addListings
-                                |> Encode.list PageType.encode
+                                |> Encode.list Content.encode
                           )
                         ]
 
@@ -116,7 +116,7 @@ init siteSrc =
     ( (), sendFileData json )
 
 
-addListings : List PageType -> List PageType
+addListings : List Content -> List Content
 addListings pages =
     let
         posts =

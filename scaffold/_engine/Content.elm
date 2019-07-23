@@ -1,6 +1,6 @@
-module PageType exposing
-    ( PageData
-    , PageType(..)
+module Content exposing
+    ( Content(..)
+    , PageData
     , PostData
     , PostList
     , encode
@@ -14,7 +14,7 @@ import Json.Decode as Decode exposing (Decoder)
 import Json.Encode as Encode exposing (Value)
 
 
-type PageType
+type Content
     = Post PostData
     | Posts PostList
     | Page PageData
@@ -43,7 +43,7 @@ type alias PageData =
     }
 
 
-encode : PageType -> Value
+encode : Content -> Value
 encode pageType =
     case pageType of
         Post postData ->
@@ -104,7 +104,7 @@ encodePostList postList =
     Encode.object
         [ ( "title", Encode.string postList.title )
         , ( "posts", Encode.list encodePostData postList.posts )
-        , ( "outputPath", Encode.string "posts/index.html" )
+        , ( "outputPath", Encode.string "index.html" )
         ]
 
 

@@ -1,10 +1,10 @@
 module Page exposing (footer, header, layout, main, markdown)
 
+import Content exposing (pageDataDecoder)
 import Elmstatic exposing (..)
 import Html exposing (..)
 import Html.Attributes as Attr exposing (alt, attribute, class, href, src)
 import Markdown
-import PageType exposing (pageDataDecoder)
 import Styles
 
 
@@ -61,7 +61,7 @@ header =
     , div [ class "navigation" ]
         [ ul []
             [ li []
-                [ a [ href "/posts" ]
+                [ a [ href "/" ]
                     [ text "Posts" ]
                 ]
             , li []

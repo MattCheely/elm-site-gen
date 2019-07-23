@@ -1,10 +1,10 @@
 module Posts exposing (main)
 
+import Content exposing (PostData)
 import Elmstatic
 import Html exposing (..)
 import Html.Attributes as Attr exposing (alt, attribute, class, href, src)
 import Page
-import PageType exposing (PostData)
 import Post
 
 
@@ -22,7 +22,7 @@ main =
             List.sortBy .date posts
                 |> List.reverse
     in
-    Elmstatic.layout PageType.postListDecoder <|
+    Elmstatic.layout Content.postListDecoder <|
         \content ->
             Page.layout content.title <| postListContent <| sortPosts content.posts
 
@@ -30,6 +30,6 @@ main =
 postItemView : PostData -> Html Never
 postItemView post =
     div []
-        [ a [ href ("/" ++ PageType.postPath post) ] [ h2 [] [ text post.title ] ]
+        [ a [ href ("/" ++ Content.postPath post) ] [ h2 [] [ text post.title ] ]
         , Post.metadataHtml post
         ]

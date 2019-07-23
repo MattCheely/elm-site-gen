@@ -1,11 +1,11 @@
 module Post exposing (main, metadataHtml)
 
+import Content exposing (PostData, postDataDecoder)
 import Elmstatic exposing (..)
 import Html exposing (..)
 import Html.Attributes as Attr exposing (alt, attribute, class, href, src)
 import Json.Decode as Decode exposing (Decoder)
 import Page
-import PageType exposing (PostData, postDataDecoder)
 
 
 tagsToHtml : List String -> List (Html Never)

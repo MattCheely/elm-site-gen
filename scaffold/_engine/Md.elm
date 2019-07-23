@@ -1,7 +1,7 @@
 module Md exposing (parsePage, parsePost, parsePostList)
 
+import Content exposing (PageData, PostData, PostList)
 import Dict exposing (Dict)
-import PageType exposing (PageData, PostData, PostList)
 import Parser
     exposing
         ( (|.)
@@ -52,7 +52,7 @@ parsePost file =
                 )
                 (Ok
                     (file.path
-                        |> String.replace "_posts/" ""
+                        |> String.replace "posts/" ""
                         |> String.dropRight 3
                     )
                 )
@@ -86,7 +86,7 @@ parsePage file =
                 )
                 (Ok
                     (file.path
-                        |> String.replace "_pages/" ""
+                        |> String.replace "pages/" ""
                         |> String.dropRight 3
                     )
                 )

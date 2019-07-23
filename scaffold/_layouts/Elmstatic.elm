@@ -9,11 +9,11 @@ port module Elmstatic exposing
     )
 
 import Browser
+import Content exposing (PageData, PostData, PostList, postDataDecoder)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Json.Decode as Decode exposing (Decoder)
 import Json.Encode as Encode
-import PageType exposing (PageData, PostData, PostList, postDataDecoder)
 import SiteConfig exposing (SiteConfig)
 
 

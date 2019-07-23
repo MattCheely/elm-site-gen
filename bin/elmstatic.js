@@ -38,7 +38,7 @@ if (mode == "generate" || mode == "draft") {
 
     let siteSrc = {
       config: config,
-      files: readContentFiles(config.contentDirs, config.contentExtensions)
+      files: readContentFiles(config.contentExtensions)
     };
 
     Elm.FileProcessor.init({
@@ -100,20 +100,18 @@ function printHelp() {
   ]);
 }
 
-function readContentFiles(contentDirs, extensions) {
-  return contentDirs
-    .map(dir => {
-      return Glob.sync(`${dir}/**/*`, { nodir: true });
-    })
-    .flat()
-    .map(readFileData.bind(null, extensions));
+function readContentFiles(extensions) {
+  return Glob.sync(`**/*`, { nodir: true, cwd: "content" }).map(
+    readFileData.bind(null, extensions)
+  );
 }
 
 function readFileData(extensions, path) {
   const isContentFile = extensions.includes(Path.extname(path));
+  const readPath = Path.join("content", path);
   return {
     path: path,
-    content: isContentFile ? Fs.readFileSync(path).toString() : ""
+    content: isContentFile ? Fs.readFileSync(readPath).toString() : ""
   };
 }
 
@@ -127,7 +125,7 @@ function renderFiles(elmJs, parsedSrc, config) {
         writePage(page, config);
       });
     } else {
-      Fs.copySync(file.sourcePath, Path.join("dist", file.destPath));
+        Fs.copySync(Path.join('content', file.sourcePath), Path.join("dist", file.destPath));
     }
   });
 }
