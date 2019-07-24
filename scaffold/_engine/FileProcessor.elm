@@ -5,6 +5,7 @@ import Json.Encode as Encode
 import Md
 import Platform exposing (worker)
 import SiteConfig exposing (SiteConfig)
+import String.Extra exposing (toTitleCase)
 
 
 type alias SiteSrc =
@@ -105,7 +106,7 @@ init siteSrc =
                         [ ( "siteConfig", SiteConfig.encode siteSrc.config )
                         , ( "files"
                           , fileData
-                                |> addListings
+                                |> addListings siteSrc.config
                                 |> Encode.list Content.encode
                           )
                         ]
@@ -116,8 +117,8 @@ init siteSrc =
     ( (), sendFileData json )
 
 
-addListings : List Content -> List Content
-addListings pages =
+addListings : SiteConfig -> List Content -> List Content
+addListings config pages =
     let
         posts =
             List.filterMap
@@ -141,6 +142,32 @@ addListings pages =
                     _ ->
                         page
             )
+        |> List.append (tagIndexes config.tags posts)
+
+
+tagIndexes : List String -> List PostData -> List Content
+tagIndexes tags posts =
+    List.map (tagIndex posts) tags
+
+
+tagIndex : List PostData -> String -> Content
+tagIndex posts tag =
+    let
+        taggedPosts =
+            List.filterMap
+                (\postData ->
+                    if List.member tag postData.tags then
+                        Just postData
+
+                    else
+                        Nothing
+                )
+                posts
+    in
+    TagIndex tag
+        { title = tag ++ " Posts" |> toTitleCase
+        , posts = taggedPosts
+        }
 
 
 port sendFileData : Encode.Value -> Cmd msg

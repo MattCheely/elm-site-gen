@@ -16,8 +16,9 @@ import Json.Encode as Encode exposing (Value)
 
 type Content
     = Post PostData
-    | Posts PostList
     | Page PageData
+    | Posts PostList
+    | TagIndex String PostList
     | Static String String
 
 
@@ -43,6 +44,13 @@ type alias PageData =
     }
 
 
+
+{- TODO: Create a type that represents the JS content contract:
+   layout, outputPath, whateverData
+   "Static" is a special layout
+-}
+
+
 encode : Content -> Value
 encode pageType =
     case pageType of
@@ -52,16 +60,22 @@ encode pageType =
                 , ( "data", encodePostData postData )
                 ]
 
-        Posts postList ->
-            Encode.object
-                [ ( "layout", Encode.string "Posts" )
-                , ( "data", encodePostList postList )
-                ]
-
         Page pageData ->
             Encode.object
                 [ ( "layout", Encode.string "Page" )
                 , ( "data", encodePageData pageData )
+                ]
+
+        Posts postList ->
+            Encode.object
+                [ ( "layout", Encode.string "Posts" )
+                , ( "data", encodePostList "index.html" postList )
+                ]
+
+        TagIndex tag posts ->
+            Encode.object
+                [ ( "layout", Encode.string "Tag" )
+                , ( "data", encodePostList ("tags/" ++ tag ++ "/index.html") posts )
                 ]
 
         Static src dest ->
@@ -99,12 +113,12 @@ postDataDecoder =
         (Decode.field "slug" Decode.string)
 
 
-encodePostList : PostList -> Value
-encodePostList postList =
+encodePostList : String -> PostList -> Value
+encodePostList outputPath postList =
     Encode.object
         [ ( "title", Encode.string postList.title )
         , ( "posts", Encode.list encodePostData postList.posts )
-        , ( "outputPath", Encode.string "index.html" )
+        , ( "outputPath", Encode.string outputPath )
         ]
 
 
