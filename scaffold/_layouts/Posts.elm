@@ -1,9 +1,9 @@
 module Posts exposing (main)
 
+import Accessibility.Styled as Html exposing (..)
 import Content exposing (PostData)
 import Elmstatic
-import Html exposing (..)
-import Html.Attributes as Attr exposing (alt, attribute, class, href, src)
+import Html.Styled.Attributes as Attr exposing (alt, attribute, class, href, src)
 import Page
 import Post
 

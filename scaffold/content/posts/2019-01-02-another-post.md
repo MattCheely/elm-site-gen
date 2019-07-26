@@ -1,9 +1,9 @@
 ---
-title: Another post
+title: Example Post
 tags: other
 ---
 
-This is another example of a blog post.
+This is a sample post.
 
 # Heading 1
 

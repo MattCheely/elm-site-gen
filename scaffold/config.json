@@ -1,20 +1,6 @@
 {
-    "title": "Author's fancy blog",
+    "title": "My Blog",
     "outputDir": "dist",
     "contentExtensions": [".md"],
-    "feed": {
-        "title": "Author's fancy blog",
-        "description": "Author's blog posts",
-        "id": "https://example.com",
-        "link": "https://example.com/posts",
-        "image": "https://example.com/img/logo.png",
-        "copyright": "Copyright: Author",
-        "language": "en",
-        "generator": "Elmstatic", 
-        "author": {
-          "name": "Author",
-          "link": "https://example.com/about"
-        }        
-    },
-    "tags": ["other", "software"]
+    "tags": ["other"]
 }

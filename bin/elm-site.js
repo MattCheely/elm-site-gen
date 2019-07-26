@@ -72,7 +72,7 @@ function build(elmPath) {
   const elmFiles = layouts.concat(engine);
 
   let command = R.isNil(elmPath) ? "elm" : elmPath;
-  let args = ["make", elmFiles, /*"--optimize",*/ "--output", "elm.js"];
+  let args = ["make", elmFiles, "--optimize", "--output", "elm.js"];
 
   console.log(`  $ ${command} ${R.flatten(args).join(" ")}`);
   const res = spawn.sync(command, R.flatten(args), { stdio: "inherit" });

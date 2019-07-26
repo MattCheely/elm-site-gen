@@ -1,16 +1,14 @@
 {
-  "name": "elmstatic",
-  "version": "0.4.1",
-  "description": "Elm-to-HTML static site generator",
-  "homepage": "https://korban.net/elm/elmstatic",
-  "repository": "github:alexkorban/elmstatic",
+  "name": "elm-site-gen",
+  "version": "0.0.1",
+  "description": "Elm static site generator",
   "bin": {
-    "elmstatic": "./bin/elmstatic.js"
+    "elm-site": "./bin/elm-site.js"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Alex Korban (https://korban.net/elm)",
+  "author": "Matt Cheely",
   "license": "GPL-3.0",
   "dependencies": {
     "bluebird": "^3.5.1",

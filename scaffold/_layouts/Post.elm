@@ -1,9 +1,9 @@
 module Post exposing (main, metadataHtml)
 
+import Accessibility.Styled as Html exposing (..)
 import Content exposing (PostData, postDataDecoder)
 import Elmstatic exposing (..)
-import Html exposing (..)
-import Html.Attributes as Attr exposing (alt, attribute, class, href, src)
+import Html.Styled.Attributes as Attr exposing (alt, attribute, class, href, src)
 import Json.Decode as Decode exposing (Decoder)
 import Page
 

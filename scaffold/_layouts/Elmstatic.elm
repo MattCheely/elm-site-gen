@@ -2,16 +2,15 @@ port module Elmstatic exposing
     ( Content
     , Layout
     , htmlTemplate
-    , inlineScript
     , layout
-    , script
     , stylesheet
     )
 
+import Accessibility.Styled as Html exposing (..)
 import Browser
 import Content exposing (PageData, PostData, PostList, postDataDecoder)
-import Html exposing (..)
-import Html.Attributes exposing (..)
+import Html.Styled exposing (node)
+import Html.Styled.Attributes exposing (..)
 import Json.Decode as Decode exposing (Decoder)
 import Json.Encode as Encode
 import SiteConfig exposing (SiteConfig)
@@ -31,16 +30,6 @@ type alias Layout =
     Program Decode.Value Decode.Value Never
 
 
-script : String -> Html Never
-script src =
-    node "citatsmle-script" [ attribute "src" src ] []
-
-
-inlineScript : String -> Html Never
-inlineScript js =
-    node "citatsmle-script" [] [ text js ]
-
-
 stylesheet : String -> Html Never
 stylesheet href =
     node "link" [ attribute "href" href, attribute "rel" "stylesheet", attribute "type" "text/css" ] []
@@ -54,11 +43,8 @@ htmlTemplate title contentNodes =
             []
             [ node "title" [] [ text title ]
             , node "meta" [ attribute "charset" "utf-8" ] []
-            , script "//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.1/highlight.min.js"
-            , script "//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.1/languages/elm.min.js"
-            , inlineScript "hljs.initHighlightingOnLoad();"
-            , stylesheet "//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.1/styles/default.min.css"
-            , stylesheet "//fonts.googleapis.com/css?family=Open+Sans|Proza+Libre|Inconsolata"
+            , stylesheet "//fonts.googleapis.com/css?family=Alegreya|Space+Mono&display=swap"
+            , stylesheet "//indestructibletype.com/fonts/Jost.css"
             ]
         , node "body" [] contentNodes
         ]
@@ -86,12 +72,18 @@ layout contentDecoder view =
                 case Decode.decodeValue decoder contentJson of
                     Err error ->
                         { title = ""
-                        , body = [ htmlTemplate "Error" [ Html.text <| Decode.errorToString error ] ]
+                        , body =
+                            [ htmlTemplate "Error" [ Html.text <| Decode.errorToString error ]
+                                |> Html.toUnstyled
+                            ]
                         }
 
                     Ok input ->
                         { title = ""
-                        , body = [ htmlTemplate input.siteConfig.title <| view input.content ]
+                        , body =
+                            [ htmlTemplate input.content.title (view input.content)
+                                |> Html.toUnstyled
+                            ]
                         }
         , update = \msg contentJson -> ( contentJson, Cmd.none )
         , subscriptions = \_ -> Sub.none

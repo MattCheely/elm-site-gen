@@ -1,14 +1,8 @@
-# Elmstatic
+# Elm Site Gen
 
-Elmstatic is an Elm-to-HTML static site generator. 
+This is an Elm-to-HTML static site generator. I use it for my personal site.
 
-For more information: https://korban.net/elm/elmstatic
+It started out as a fork of Alex Korban's excellent [Elmstatic](https://korban.net/elm/elmstatic).
+You may want to take a look at his project for something more actively maintained.
 
-## Who is using this? 
-
-There are a couple of sites that I'm aware of:
-
-- [korban.net](https://korban.net/elm) (my site)
-- [programming-elm.com](https://programming-elm.com) (Site for the Programming Elm book)
-
-Do you have a public Elmstatic site? Please [contact me](https://korban.net/elm/contact) and let me know so I can add it here!
+Currently I'm just using this for my personal needs, and updates are irregular.
