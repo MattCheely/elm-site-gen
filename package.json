@@ -13,7 +13,7 @@
   "dependencies": {
     "bluebird": "^3.5.1",
     "cross-spawn": "^6.0.5",
-    "feed": "^2.0.0",
+    "feed": "^4.2.2",
     "fs-extra": "^7.0.0",
     "glob": "^7.1.2",
     "jsdom": "^13.2.0",
